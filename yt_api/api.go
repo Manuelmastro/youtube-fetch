@@ -26,6 +26,8 @@ func fetchYouTubeData() ([]models.Video, error) {
 		"https://www.googleapis.com/youtube/v3/search?part=snippet&q=%s&type=video&maxResults=50&key=%s",
 		config.Query, apiKey)
 
+	log.Printf("%s Info: Fetching data from YouTube API with query: %s", time.Now().Format(time.RFC3339), config.Query)
+
 	resp, err := http.Get(url)
 	if err != nil {
 		return nil, fmt.Errorf("API call failed: %v", err)
@@ -71,5 +73,7 @@ func fetchYouTubeData() ([]models.Video, error) {
 			VideoID:      item.ID.VideoID,
 		})
 	}
+
+	log.Printf("%s Info: Fetched %d videos from YouTube API", time.Now().Format(time.RFC3339), len(videos))
 	return videos, nil
 }
