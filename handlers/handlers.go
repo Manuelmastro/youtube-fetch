@@ -57,10 +57,8 @@ func GetVideos(c *gin.Context) {
 	})
 }
 
-// SearchVideos fetches videos by title or description with selected fields only.
 func SearchVideos(c *gin.Context) {
-	titleQuery := c.Query("title")
-	descriptionQuery := c.Query("description")
+	queryParam := c.Query("query") // User search query
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
 	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "10"))
 
@@ -73,15 +71,24 @@ func SearchVideos(c *gin.Context) {
 	var videos []models.Video
 	var total int64
 
+	// Base query
 	query := config.Db.Model(&models.Video{})
-	if titleQuery != "" {
-		query = query.Where("LOWER(title) LIKE ?", "%"+titleQuery+"%")
-	}
-	if descriptionQuery != "" {
-		query = query.Where("LOWER(description) LIKE ?", "%"+descriptionQuery+"%")
+
+	// Add full-text search condition if query is provided
+	if queryParam != "" {
+		query = query.Select("*, ts_rank(search_vector, plainto_tsquery(?)) AS rank", queryParam).
+			Where("search_vector @@ plainto_tsquery(?)", queryParam).
+			Order("rank DESC") // Order by relevance
+	} else {
+		// Default sorting if no search query
+		query = query.Order("publish_datetime DESC")
 	}
 
-	query.Count(&total).Order("publish_datetime DESC").Limit(limit).Offset(offset).Find(&videos)
+	// Count total results
+	query.Count(&total)
+
+	// Fetch paginated data
+	query.Limit(limit).Offset(offset).Find(&videos)
 
 	// Map to custom struct
 	var videoResponses []VideoResponse
@@ -95,6 +102,7 @@ func SearchVideos(c *gin.Context) {
 		})
 	}
 
+	// Return JSON response
 	c.JSON(http.StatusOK, gin.H{
 		"total":       total,
 		"page":        page,

@@ -21,9 +21,12 @@ func rotateAPIKey() string {
 }
 
 func fetchYouTubeData() ([]models.Video, error) {
+	var allVideos []models.Video // To store all videos fetched
 	apiKey := config.ApiKeys[config.CurrentKey]
+
+	// Build the API URL with order=date to sort by most recent
 	url := fmt.Sprintf(
-		"https://www.googleapis.com/youtube/v3/search?part=snippet&q=%s&type=video&maxResults=50&key=%s",
+		"https://www.googleapis.com/youtube/v3/search?part=snippet&q=%s&type=video&maxResults=50&order=date&key=%s",
 		config.Query, apiKey)
 
 	log.Printf("%s Info: Fetching data from YouTube API with query: %s", time.Now().Format(time.RFC3339), config.Query)
@@ -62,10 +65,10 @@ func fetchYouTubeData() ([]models.Video, error) {
 		return nil, fmt.Errorf("failed to decode response: %v", err)
 	}
 
-	var videos []models.Video
+	// Process the items and append them to the allVideos slice
 	for _, item := range data.Items {
 		publishTime, _ := time.Parse(time.RFC3339, item.Snippet.PublishedAt)
-		videos = append(videos, models.Video{
+		allVideos = append(allVideos, models.Video{
 			Title:        item.Snippet.Title,
 			Description:  item.Snippet.Description,
 			PublishTime:  publishTime,
@@ -74,6 +77,7 @@ func fetchYouTubeData() ([]models.Video, error) {
 		})
 	}
 
-	log.Printf("%s Info: Fetched %d videos from YouTube API", time.Now().Format(time.RFC3339), len(videos))
-	return videos, nil
+	log.Printf("%s Info: Fetched %d videos from YouTube API", time.Now().Format(time.RFC3339), len(data.Items))
+
+	return allVideos, nil
 }

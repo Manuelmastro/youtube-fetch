@@ -15,6 +15,9 @@ func storeData(videos []models.Video) {
 		// Log the video insertion attempt
 		log.Printf("%s Info: Inserting video with VideoID: %s into the database", time.Now().Format(time.RFC3339), video.VideoID)
 
+		// Set search_vector to an empty string, so it won't be inserted manually
+		video.SearchVector = ""
+
 		// Use GORM's Create or Save method with OnConflict to handle "upsert"
 		if err := config.Db.Clauses(clause.OnConflict{
 			Columns:   []clause.Column{{Name: "video_id"}}, // Specify the unique constraint column(s)

@@ -6,7 +6,7 @@ import (
 )
 
 func BackgroundProcess() {
-	ticker := time.NewTicker(10 * time.Second)
+	ticker := time.NewTicker(1 * time.Minute)
 	defer ticker.Stop()
 
 	// Use for range to receive ticks from the ticker channel
