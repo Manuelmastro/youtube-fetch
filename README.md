@@ -98,7 +98,7 @@ Send a GET request to /search with a query parameter to search for videos by tit
 
 ### Example Request:
 ```url
-GET /search?query=messi
+GET /videos/search?query=messi
 ```
 #### Example Response:
 ```json
