@@ -12,7 +12,7 @@ import (
 // Store data in the database
 func storeData(videos []models.Video) {
 	for _, video := range videos {
-		// Log the video insertion attempt
+
 		log.Printf("%s Info: Inserting video with VideoID: %s into the database", time.Now().Format(time.RFC3339), video.VideoID)
 
 		// Set search_vector to an empty string, so it won't be inserted manually

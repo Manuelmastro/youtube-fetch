@@ -18,7 +18,7 @@ type VideoResponse struct {
 	VideoID         string `json:"video_id"`
 }
 
-// GetVideos fetches paginated and sorted videos with selected fields only.
+// GetVideos fetches paginated and sorted videos with selected fields
 func GetVideos(c *gin.Context) {
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
 	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "10"))
@@ -71,7 +71,6 @@ func SearchVideos(c *gin.Context) {
 	var videos []models.Video
 	var total int64
 
-	// Base query
 	query := config.Db.Model(&models.Video{})
 
 	// Add full-text search condition if query is provided

@@ -11,6 +11,7 @@ import (
 	"time"
 )
 
+// function to rotate api keys when Quota exhaustes
 func rotateAPIKey() string {
 	var mu sync.Mutex
 	mu.Lock()
@@ -21,10 +22,10 @@ func rotateAPIKey() string {
 }
 
 func fetchYouTubeData() ([]models.Video, error) {
-	var allVideos []models.Video // To store all videos fetched
+	var allVideos []models.Video
 	apiKey := config.ApiKeys[config.CurrentKey]
 
-	// Build the API URL with order=date to sort by most recent
+	// Build the API URL w
 	url := fmt.Sprintf(
 		"https://www.googleapis.com/youtube/v3/search?part=snippet&q=%s&type=video&maxResults=50&order=date&key=%s",
 		config.Query, apiKey)
